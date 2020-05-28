@@ -1,0 +1,13 @@
+.Header {
+  height: 80px;
+  width: 100%;
+  display: block;
+  background-color: #7DBCEA;
+}
+
+.Inner__Header{
+    margin: 0 auto;
+    height: 100%;
+    width: 500px;
+    background-color: #108EE9;
+}
