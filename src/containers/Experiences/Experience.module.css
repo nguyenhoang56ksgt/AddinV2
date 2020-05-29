@@ -1,0 +1,22 @@
+.Container {
+  width: 60%;
+  margin: 100px auto;
+  display: table;
+}
+
+.Row {
+  display: table-row;
+}
+
+.Col {
+ display: table-cell;
+ border: 1px solid;
+}
+
+.Col:hover{
+    background-color: red;
+}
+
+.Col:visited{
+    background-color: green;
+}
