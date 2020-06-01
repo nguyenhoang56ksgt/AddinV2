@@ -5,6 +5,7 @@ import {
   GET_TASK_SUCCESS,
   GET_TASK_FAIL,
   GET_TASK_START,
+  DELETE_TASK_SUCCESS,
 } from '../actions/actionTypes';
 
 const initialState = {
@@ -42,6 +43,11 @@ export default function (state = initialState, action) {
         loading: false,
       };
 
+    case DELETE_TASK_SUCCESS:
+      return {
+        ...state,
+        tasks: state.tasks.filter((task) => task.id !== payload),
+      };
     default:
       return state;
   }

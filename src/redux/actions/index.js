@@ -1,3 +1,3 @@
 export { auth, logout } from './auth';
 
-export { addTask, getTasks } from './task';
+export { addTask, getTasks, updateTask, deleteTask } from './task';

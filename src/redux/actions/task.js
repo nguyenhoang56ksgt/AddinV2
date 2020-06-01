@@ -6,6 +6,7 @@ import {
   GET_TASK_FAIL,
   GET_TASK_SUCCESS,
   GET_TASK_START,
+  DELETE_TASK_SUCCESS,
 } from './actionTypes';
 
 export const addTask = (task) => {
@@ -44,5 +45,24 @@ export const getTasks = () => {
         dispatch({ type: GET_TASK_SUCCESS, payload: fetchedTasks });
       })
       .catch((err) => dispatch({ type: GET_TASK_FAIL, payload: err }));
+  };
+};
+
+export const updateTask = (task) => {
+  return (dispatch) => {
+    axiosService
+      .put(`/tasks.json/${task.id}`, task)
+      .then((res) => console.log(res));
+  };
+};
+
+export const deleteTask = (taskId) => {
+  return (dispatch) => {
+    axiosService.delete(`/tasks/${taskId}.json`).then((res) => {
+      dispatch({
+        type: DELETE_TASK_SUCCESS,
+        payload: taskId,
+      });
+    });
   };
 };

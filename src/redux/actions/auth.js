@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { LOGIN_START, LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT } from './actionTypes';
+import firebase from '../../firebase';
 
 const authStart = () => {
   return {
@@ -46,7 +47,7 @@ export const auth = (email, password) => {
 
     const url =
       'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDMMFzFUTtsKrNWRh9yThgT-s_gwOwU0K4';
-
+    
     axios
       .post(url, authData)
       .then((res) => {

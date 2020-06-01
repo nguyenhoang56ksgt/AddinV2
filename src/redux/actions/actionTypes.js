@@ -9,3 +9,4 @@ export const ADD_TASK_FAIL = 'ADD_TASK_FAIL';
 export const GET_TASK_SUCCESS = 'GET_TASK_SUCCESS';
 export const GET_TASK_FAIL = 'GET_TASK_FAIL';
 export const GET_TASK_START = 'GET_TASK_START';
+export const DELETE_TASK_SUCCESS = 'SUCCESS';

@@ -16,7 +16,7 @@ export const About = () => {
           2018
         </Timeline.Item>
       </Timeline>
-    </div>
+    </div> 
   );
 };
 

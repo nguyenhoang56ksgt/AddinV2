@@ -4,27 +4,28 @@ import { connect } from 'react-redux';
 import { Input, Button, Form, Table, Space, Tabs, Tag, Popconfirm } from 'antd';
 import Moment from 'react-moment';
 import moment from 'moment';
-import { EditOutlined,DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined, DeleteOutlined } from '@ant-design/icons';
 import classes from './Todo.module.css';
 import * as actions from '../../redux/actions';
 import taskTags from '../../constants/taskTags';
 
 const { TabPane } = Tabs;
 const { CheckableTag } = Tag;
-function confirm(e) {
-  console.log(e);
-}
+
 
 function cancel(e) {
   console.log(e);
 }
-const Todo = ({ loading, onAddTask, tasks, onGetTask }) => {
+const Todo = ({ loading, onAddTask, tasks, onGetTask, onDeleteTask }) => {
   useEffect(() => {
     onGetTask();
   }, [onGetTask]);
 
   const [selectedTags, setSelectedTags] = useState([taskTags[0]]);
 
+  const deleteTask =(taskId) => {
+    onDeleteTask(taskId)
+  }
   const handleAddTask = ({ taskname }) => {
     const task = {
       name: taskname,
@@ -91,12 +92,12 @@ const Todo = ({ loading, onAddTask, tasks, onGetTask }) => {
           <Button size="small">
             <Popconfirm
               title="Are you sure delete this task?"
-              onConfirm={confirm}
+              onConfirm={()=>deleteTask(record.key)}
               onCancel={cancel}
               okText="Yes"
               cancelText="No"
             >
-            <DeleteOutlined />
+              <DeleteOutlined />
             </Popconfirm>
           </Button>
         </Space>
@@ -164,6 +165,7 @@ Todo.propTypes = {
   onAddTask: PropTypes.func.isRequired,
   tasks: PropTypes.array.isRequired,
   onGetTask: PropTypes.func.isRequired,
+  onDeleteTask: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => ({
   loading: state.task.loading,
@@ -174,6 +176,7 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onAddTask: (task) => dispatch(actions.addTask(task)),
     onGetTask: () => dispatch(actions.getTasks()),
+    onDeleteTask: (taskId) => dispatch(actions.deleteTask(taskId)),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Todo);
