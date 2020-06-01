@@ -1,6 +1,6 @@
 import React from 'react';
-import classes from './Experience.module.css';
-export const Experience = () => {
+import classes from './Home.module.css';
+export const Home = () => {
   return (
     <div className={classes.Container}>
       <div className={classes.Row}>
@@ -17,4 +17,4 @@ export const Experience = () => {
   );
 };
 
-export default Experience;
+export default Home;

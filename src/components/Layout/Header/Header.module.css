@@ -1,41 +1,18 @@
-.Header {
-  height: 80px;
+.Button{
+  float: right;
+  margin: auto 6px;
+}
+
+.login_form {
+  max-width: 300px;
+  margin: 0 auto;
+}
+.login_form_forgot {
+  float: right;
+}
+.ant_col_rtl .login_form_forgot {
+  float: left;
+}
+.login_form_button {
   width: 100%;
-  display: block;
-  background-color: #7dbcea;
-  position: fixed;
- 
-}
-
-.Inner__Header {
-  margin: 0 auto;
-  height: 100%;
-  width: 50%;
-  background-color: #108ee9; 
-}
-
-.Inner__Header ul{
-  margin: 0 auto;
-  list-style-type: none;
-  text-align: center;
-  
-}
-.Inner__Header ul li {
-  display: inline-table;
-  line-height: 80px;
-  margin: 0 5%;
-  font-weight: bold;
-  color: aliceblue;
-  width: 100px;
-  
-}
-.Inner__Header ul li a{
-  color: aliceblue;
-  text-decoration: none;
-  display: block;
-  
-}
-.Inner__Header a:hover {
-  background-color: honeydew;
-  color: red;
 }
