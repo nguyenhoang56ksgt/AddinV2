@@ -37,14 +37,13 @@ export const checkAuthTimeout = (expirationTime) => {
 };
 
 export const auth = (email, password, firebase) => {
-  
   return (dispatch) => {
     dispatch(authStart());
     firebase
       .auth()
       .signInWithEmailAndPassword(email, password)
       .then((res) => {
-        console.log(res)
+        console.log(res);
         dispatch(authSuccess(res.data));
       })
       .catch((err) => {
@@ -72,4 +71,36 @@ export const auth = (email, password, firebase) => {
   //     dispatch(authFail(err.response.data.error));
   //   });
   // };
+};
+
+export const signIn = (credentials, firebase) => (
+  dispatch,
+  getState,
+  { getFirebase },
+) => {
+  dispatch(authStart());
+  const firebase = getFirebase();
+  console.log(firebase)
+  console.log(credentials)
+
+  firebase
+    .auth()
+    .signInWithEmailAndPassword(credentials.username, credentials.password)
+    .then((res) => {
+      dispatch(authSuccess({type:LOGIN_SUCCESS}));
+    })
+    .catch((err) => {
+      dispatch(authFail(err));
+    });
+};
+
+export const signOut = () => (dispatch, getState, { getFirebase }) => {
+  const firebase = getFirebase();
+
+  firebase
+    .auth()
+    .signOut()
+    .then(() => {
+      dispatch(logout());
+    })
 };

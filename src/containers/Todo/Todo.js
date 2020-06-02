@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { firebaseConnect } from 'react-redux-firebase';
+import { firestoreConnect  } from 'react-redux-firebase';
 import { compose } from 'redux';
 import { Input, Button, Form, Table, Space, Tabs, Tag, Popconfirm } from 'antd';
 import Moment from 'react-moment';
@@ -24,9 +24,10 @@ const Todo = ({
   onGetTask,
   onDeleteTask,
   firebase,
+  store,
 }) => {
   useEffect(() => {
-    onGetTask(firebase);
+    onGetTask(store);
   }, []);
 
   const [selectedTags, setSelectedTags] = useState([taskTags[0]]);
@@ -176,7 +177,7 @@ Todo.propTypes = {
   onDeleteTask: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
-  console.log(state);
+  console.log(state)
   return {
     loading: state.task.loading,
     tasks: state.task.tasks,
@@ -186,11 +187,11 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     onAddTask: (task) => dispatch(actions.addTask(task)),
-    onGetTask: (firebase) => dispatch(actions.getTasks(firebase)),
+    onGetTask: (store) => dispatch(actions.getTasks(store)),
     onDeleteTask: (taskId) => dispatch(actions.deleteTask(taskId)),
   };
 };
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  firebaseConnect([]),
+  firestoreConnect([{ collection: 'tasks' }]),
 )(Todo);

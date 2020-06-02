@@ -10,6 +10,7 @@ const initialState = {
   isAuthenticated: false,
   loading: false,
   user: null,
+  authError:null,
 };
 
 export default function (state = initialState, action) {
@@ -30,6 +31,7 @@ export default function (state = initialState, action) {
         isAuthenticated: true,
         loading: false,
         error: null,
+        authError:null
       };
 
     case LOGIN_FAIL:
@@ -40,6 +42,7 @@ export default function (state = initialState, action) {
         isAuthenticated: false,
         loading: false,
         error: payload,
+        authError: 'Login failed'
       };
     case LOGOUT:
       localStorage.removeItem('token');

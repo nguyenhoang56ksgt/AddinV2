@@ -20,7 +20,16 @@ import * as actions from '../../../redux/actions/index';
 const { Text } = Typography;
 
 const Header = (props) => {
-  const { loading, error, isAuthenticated, login, logout, firebase } = props;
+  const {
+    loading,
+    error,
+    isAuthenticated,
+    login,
+    logout,
+    firebase,
+    signIn,
+    signOut
+  } = props;
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -42,11 +51,13 @@ const Header = (props) => {
     setVisibleModal(false);
   };
   const onFinish = ({ username, password }) => {
-    login(username, password, firebase);
+    //login(username, password, firebase);
+    signIn({ username, password });
   };
 
   const logoutUser = () => {
-    logout();
+    //logout();
+    signOut();
   };
   let errorMessage;
   if (error) {
@@ -155,6 +166,8 @@ Header.propTypes = {
   loading: PropTypes.bool.isRequired,
   login: PropTypes.func.isRequired,
   logout: PropTypes.func.isRequired,
+  signIn: PropTypes.func.isRequired,
+  signOut: PropTypes.func.isRequired,
   error: PropTypes.object.isRequired,
 };
 
@@ -171,9 +184,8 @@ const mapDispatchToProps = (dispatch) => {
     login: (email, password, firebase) =>
       dispatch(actions.auth(email, password, firebase)),
     logout: () => dispatch(actions.logout()),
+    signIn: (credentials) => dispatch(actions.signIn(credentials)),
+    signOut:() => dispatch(actions.signOut())
   };
 };
-export default compose(
-  firebaseConnect(),
-  connect(mapStateToProps, mapDispatchToProps),
-)(Header);
+export default connect(mapStateToProps, mapDispatchToProps)(Header);

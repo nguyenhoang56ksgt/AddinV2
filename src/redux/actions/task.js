@@ -12,17 +12,26 @@ import {
 
 export const addTask = (task) => {
   return (dispatch, getState, { getFirestore }) => {
-    const fireStore = getFirestore();
-    const { profile } = getState().firebase;
-    const authorId = getState().firebase.auth.uid;
+    const fireStore = getFirestore(); 
+    fireStore
+      .collection('tasks')
+      .add({
+        ...task,
+        author: 'Manh Hoang',
+      })
+      .then((res) => {
+        console.log(res);
+        dispatch({ type: ADD_TASK_SUCCESS });
+      })
+      .catch((err) => dispatch({ type: ADD_TASK_FAIL, payload: err }));
 
-    fireStore.collection('taks').add({
-      ...task,
-      createdBy: 'Hoang',
-    }).then(res => console.log(res));
-    dispatch({
-      type: ADD_TASK_START,
-    });
+    // fireStore.collection('taks').add({
+    //   ...task,
+    //   createdBy: 'Hoang',
+    // }).then(res => console.log(res));
+    // dispatch({
+    //   type: ADD_TASK_START,
+    // });
 
     // axiosService
     //   .post(`/tasks.json`, task)
@@ -37,17 +46,18 @@ export const addTask = (task) => {
   };
 };
 
-export const getTasks = (firebase) => {
+export const getTasks = (store) => {
   return (dispatch, getState, { getFirestore }) => {
     dispatch({
       type: GET_TASK_START,
     });
-    
-
-    axiosService
-      .get('/tasks.json')
-      .then((res) => {
-        const fetchedTasks = [];
+    const fireStore = getFirestore(); 
+    fireStore
+    .collection('tasks')
+    .get()
+    .then((res) => {
+      console.log(res)
+          const fetchedTasks = [];
         for (let key in res.data) {
           fetchedTasks.push({
             ...res.data[key],
@@ -55,8 +65,21 @@ export const getTasks = (firebase) => {
           });
         }
         dispatch({ type: GET_TASK_SUCCESS, payload: fetchedTasks });
-      })
-      .catch((err) => dispatch({ type: GET_TASK_FAIL, payload: err }));
+    })
+    .catch((err) =>dispatch({ type: GET_TASK_FAIL, payload: err }));
+    // axiosService
+    //   .get('/tasks.json')
+    //   .then((res) => {
+    //     const fetchedTasks = [];
+    //     for (let key in res.data) {
+    //       fetchedTasks.push({
+    //         ...res.data[key],
+    //         id: key,
+    //       });
+    //     }
+    //     dispatch({ type: GET_TASK_SUCCESS, payload: fetchedTasks });
+    //   })
+    //   .catch((err) => dispatch({ type: GET_TASK_FAIL, payload: err }));
   };
 };
 
