@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import { firebaseConnect } from 'react-redux-firebase';
+import { compose } from 'redux';
 import { Input, Button, Form, Table, Space, Tabs, Tag, Popconfirm } from 'antd';
 import Moment from 'react-moment';
 import moment from 'moment';
@@ -12,20 +14,26 @@ import taskTags from '../../constants/taskTags';
 const { TabPane } = Tabs;
 const { CheckableTag } = Tag;
 
-
 function cancel(e) {
   console.log(e);
 }
-const Todo = ({ loading, onAddTask, tasks, onGetTask, onDeleteTask }) => {
+const Todo = ({
+  loading,
+  onAddTask,
+  tasks,
+  onGetTask,
+  onDeleteTask,
+  firebase,
+}) => {
   useEffect(() => {
-    onGetTask();
-  }, [onGetTask]);
+    onGetTask(firebase);
+  }, []);
 
   const [selectedTags, setSelectedTags] = useState([taskTags[0]]);
 
-  const deleteTask =(taskId) => {
-    onDeleteTask(taskId)
-  }
+  const deleteTask = (taskId) => {
+    onDeleteTask(taskId);
+  };
   const handleAddTask = ({ taskname }) => {
     const task = {
       name: taskname,
@@ -92,7 +100,7 @@ const Todo = ({ loading, onAddTask, tasks, onGetTask, onDeleteTask }) => {
           <Button size="small">
             <Popconfirm
               title="Are you sure delete this task?"
-              onConfirm={()=>deleteTask(record.key)}
+              onConfirm={() => deleteTask(record.key)}
               onCancel={cancel}
               okText="Yes"
               cancelText="No"
@@ -167,16 +175,22 @@ Todo.propTypes = {
   onGetTask: PropTypes.func.isRequired,
   onDeleteTask: PropTypes.func.isRequired,
 };
-const mapStateToProps = (state) => ({
-  loading: state.task.loading,
-  tasks: state.task.tasks,
-});
+const mapStateToProps = (state) => {
+  console.log(state);
+  return {
+    loading: state.task.loading,
+    tasks: state.task.tasks,
+  };
+};
 
 const mapDispatchToProps = (dispatch) => {
   return {
     onAddTask: (task) => dispatch(actions.addTask(task)),
-    onGetTask: () => dispatch(actions.getTasks()),
+    onGetTask: (firebase) => dispatch(actions.getTasks(firebase)),
     onDeleteTask: (taskId) => dispatch(actions.deleteTask(taskId)),
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Todo);
+export default compose(
+  connect(mapStateToProps, mapDispatchToProps),
+  firebaseConnect([]),
+)(Todo);

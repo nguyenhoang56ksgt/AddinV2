@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const instance = axios.create({
-  baseURL:  "https://my-website-7d766.firebaseio.com/"
+  baseURL:  "https://my-website-7d766.firebaseio.com"
 });
 // eslint-disable-next-line func-names
 // instance.interceptors.request.use(function (config) {

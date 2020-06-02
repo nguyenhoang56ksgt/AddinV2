@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { LOGIN_START, LOGIN_FAIL, LOGIN_SUCCESS, LOGOUT } from './actionTypes';
-import firebase from '../../firebase';
+import firebase from '../../firebaseConfig';
 
 const authStart = () => {
   return {
@@ -36,27 +36,40 @@ export const checkAuthTimeout = (expirationTime) => {
   };
 };
 
-export const auth = (email, password) => {
+export const auth = (email, password, firebase) => {
+  
   return (dispatch) => {
     dispatch(authStart());
-    const authData = {
-      email: email,
-      password: password,
-      returnSecureToken: true,
-    };
-
-    const url =
-      'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDMMFzFUTtsKrNWRh9yThgT-s_gwOwU0K4';
-    
-    axios
-      .post(url, authData)
+    firebase
+      .auth()
+      .signInWithEmailAndPassword(email, password)
       .then((res) => {
-        console.log(res);
+        console.log(res)
         dispatch(authSuccess(res.data));
-        //dispatch(checkAuthTimeout(res.data.expiresIn));
       })
       .catch((err) => {
-        dispatch(authFail(err.response.data.error));
+        console.log(err);
+        //dispatch(authFail(err.response.data.error));
       });
   };
+  // const authData = {
+  //   email: email,
+  //   password: password,
+  //   returnSecureToken: true,
+  // };
+
+  // const url =
+  //   'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyDMMFzFUTtsKrNWRh9yThgT-s_gwOwU0K4';
+
+  // axios
+  //   .post(url, authData)
+  //   .then((res) => {
+  //     console.log(res);
+  //     dispatch(authSuccess(res.data));
+  //     //dispatch(checkAuthTimeout(res.data.expiresIn));
+  //   })
+  //   .catch((err) => {
+  //     dispatch(authFail(err.response.data.error));
+  //   });
+  // };
 };

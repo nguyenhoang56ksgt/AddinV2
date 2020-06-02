@@ -9,6 +9,7 @@
     "@testing-library/user-event": "^7.2.1",
     "antd": "^4.2.5",
     "axios": "^0.19.2",
+    "dotenv": "^8.2.0",
     "firebase": "^7.14.6",
     "moment": "^2.26.0",
     "moment-timezone": "^0.5.31",

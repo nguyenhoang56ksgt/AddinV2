@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classes from './Header.module.css';
+import { firebaseConnect } from 'react-redux-firebase';
+import { compose } from 'redux';
 import {
   Button,
   Menu,
@@ -17,7 +19,9 @@ import { UserOutlined, LockOutlined } from '@ant-design/icons';
 import * as actions from '../../../redux/actions/index';
 const { Text } = Typography;
 
-const Header = ({ loading, error, isAuthenticated, login, logout }) => {
+const Header = (props) => {
+  const { loading, error, isAuthenticated, login, logout, firebase } = props;
+
   useEffect(() => {
     if (isAuthenticated) {
       message.success('Logged successfully!');
@@ -38,7 +42,7 @@ const Header = ({ loading, error, isAuthenticated, login, logout }) => {
     setVisibleModal(false);
   };
   const onFinish = ({ username, password }) => {
-    login(username, password);
+    login(username, password, firebase);
   };
 
   const logoutUser = () => {
@@ -164,8 +168,12 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    login: (email, password) => dispatch(actions.auth(email, password)),
+    login: (email, password, firebase) =>
+      dispatch(actions.auth(email, password, firebase)),
     logout: () => dispatch(actions.logout()),
   };
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Header);
+export default compose(
+  firebaseConnect(),
+  connect(mapStateToProps, mapDispatchToProps),
+)(Header);

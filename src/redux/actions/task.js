@@ -1,4 +1,5 @@
 import axiosService from '../../axiosService';
+import firebase from '../../firebaseConfig';
 import {
   ADD_TASK_FAIL,
   ADD_TASK_START,
@@ -10,30 +11,41 @@ import {
 } from './actionTypes';
 
 export const addTask = (task) => {
-  return (dispatch) => {
+  return (dispatch, getState, { getFirestore }) => {
+    const fireStore = getFirestore();
+    const { profile } = getState().firebase;
+    const authorId = getState().firebase.auth.uid;
+
+    fireStore.collection('taks').add({
+      ...task,
+      createdBy: 'Hoang',
+    }).then(res => console.log(res));
     dispatch({
       type: ADD_TASK_START,
     });
-    axiosService
-      .post(`/tasks.json`, task)
-      .then((res) => {
-        const newTask = {
-          ...task,
-          id: res.data.name,
-        };
-        dispatch({ type: ADD_TASK_SUCCESS, payload: newTask });
-      })
-      .catch((err) => dispatch({ type: ADD_TASK_FAIL, payload: err }));
+
+    // axiosService
+    //   .post(`/tasks.json`, task)
+    //   .then((res) => {
+    //     const newTask = {
+    //       ...task,
+    //       id: res.data.name,
+    //     };
+    //     dispatch({ type: ADD_TASK_SUCCESS, payload: newTask });
+    //   })
+    //   .catch((err) => dispatch({ type: ADD_TASK_FAIL, payload: err }));
   };
 };
 
-export const getTasks = () => {
-  return (dispatch) => {
+export const getTasks = (firebase) => {
+  return (dispatch, getState, { getFirestore }) => {
     dispatch({
       type: GET_TASK_START,
     });
+    
+
     axiosService
-      .get(`/tasks.json`)
+      .get('/tasks.json')
       .then((res) => {
         const fetchedTasks = [];
         for (let key in res.data) {
@@ -51,7 +63,7 @@ export const getTasks = () => {
 export const updateTask = (task) => {
   return (dispatch) => {
     axiosService
-      .put(`/tasks.json/${task.id}`, task)
+      .put(`/tasks/${task.id}.json`, task)
       .then((res) => console.log(res));
   };
 };
