@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { firestoreConnect  } from 'react-redux-firebase';
+import { firestoreConnect } from 'react-redux-firebase';
 import { compose } from 'redux';
 import { Input, Button, Form, Table, Space, Tabs, Tag, Popconfirm } from 'antd';
 import Moment from 'react-moment';
@@ -21,14 +21,12 @@ const Todo = ({
   loading,
   onAddTask,
   tasks,
-  onGetTask,
+
   onDeleteTask,
   firebase,
   store,
 }) => {
-  useEffect(() => {
-    onGetTask(store);
-  }, []);
+  useEffect(() => {}, []);
 
   const [selectedTags, setSelectedTags] = useState([taskTags[0]]);
 
@@ -113,7 +111,14 @@ const Todo = ({
       ),
     },
   ];
-  const data = tasks.map((task) => {
+  const fetchedTasks = [];
+  for (let key in tasks) {
+    fetchedTasks.push({
+      ...tasks[key],
+      id: key,
+    });
+  }
+  const data = fetchedTasks.reverse().map((task) => {
     return {
       key: task.id,
       date: task.createdAt,
@@ -172,26 +177,24 @@ const Todo = ({
 Todo.propTypes = {
   loading: PropTypes.bool.isRequired,
   onAddTask: PropTypes.func.isRequired,
-  tasks: PropTypes.array.isRequired,
-  onGetTask: PropTypes.func.isRequired,
+  tasks: PropTypes.object.isRequired,
+
   onDeleteTask: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
-  console.log(state)
   return {
     loading: state.task.loading,
-    tasks: state.task.tasks,
+    tasks: state.firestore.data.tasks,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onAddTask: (task) => dispatch(actions.addTask(task)),
-    onGetTask: (store) => dispatch(actions.getTasks(store)),
+    onAddTask: (task) => dispatch(actions.addTask(task)), 
     onDeleteTask: (taskId) => dispatch(actions.deleteTask(taskId)),
   };
 };
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  firestoreConnect([{ collection: 'tasks' }]),
+  firestoreConnect([{ collection: 'tasks', orderBy: ['createdAt'] }]),
 )(Todo);

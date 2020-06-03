@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import classes from './Header.module.css';
-import { firebaseConnect } from 'react-redux-firebase';
-import { compose } from 'redux';
+ 
 import {
   Button,
   Menu,
@@ -20,23 +19,14 @@ import * as actions from '../../../redux/actions/index';
 const { Text } = Typography;
 
 const Header = (props) => {
-  const {
-    loading,
-    error,
-    isAuthenticated,
-    login,
-    logout,
-    firebase,
-    signIn,
-    signOut
-  } = props;
+  const { loading, error, auth, signIn, signOut } = props;
 
   useEffect(() => {
-    if (isAuthenticated) {
+    if (auth.uid) {
       message.success('Logged successfully!');
       setVisibleModal(false);
     }
-  }, [isAuthenticated, error]);
+  }, [auth, error]);
   const [current, setCurrent] = useState();
   const [visible, setVisibleModal] = useState(false);
 
@@ -51,7 +41,6 @@ const Header = (props) => {
     setVisibleModal(false);
   };
   const onFinish = ({ username, password }) => {
-    //login(username, password, firebase);
     signIn({ username, password });
   };
 
@@ -129,7 +118,7 @@ const Header = (props) => {
       Login
     </Button>
   );
-  if (isAuthenticated) {
+  if (auth.uid) {
     button = <Button onClick={logoutUser}>Logout</Button>;
   }
 
@@ -162,10 +151,8 @@ const Header = (props) => {
 };
 
 Header.propTypes = {
-  isAuthenticated: PropTypes.bool,
-  loading: PropTypes.bool.isRequired,
-  login: PropTypes.func.isRequired,
-  logout: PropTypes.func.isRequired,
+  auth: PropTypes.object.isRequired,
+  loading: PropTypes.bool.isRequired, 
   signIn: PropTypes.func.isRequired,
   signOut: PropTypes.func.isRequired,
   error: PropTypes.object.isRequired,
@@ -173,7 +160,7 @@ Header.propTypes = {
 
 const mapStateToProps = (state) => {
   return {
-    isAuthenticated: state.auth.isAuthenticated,
+    auth: state.firebase.auth,
     loading: state.auth.loading,
     error: state.auth.error,
   };
@@ -181,11 +168,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    login: (email, password, firebase) =>
-      dispatch(actions.auth(email, password, firebase)),
-    logout: () => dispatch(actions.logout()),
     signIn: (credentials) => dispatch(actions.signIn(credentials)),
-    signOut:() => dispatch(actions.signOut())
+    signOut: () => dispatch(actions.signOut()),
   };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(Header);

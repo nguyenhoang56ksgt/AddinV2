@@ -1,5 +1,5 @@
 import axiosService from '../../axiosService';
-import firebase from '../../firebaseConfig';
+ 
 import {
   ADD_TASK_FAIL,
   ADD_TASK_START,
@@ -12,7 +12,7 @@ import {
 
 export const addTask = (task) => {
   return (dispatch, getState, { getFirestore }) => {
-    const fireStore = getFirestore(); 
+    const fireStore = getFirestore();
     fireStore
       .collection('tasks')
       .add({
@@ -46,40 +46,19 @@ export const addTask = (task) => {
   };
 };
 
-export const getTasks = (store) => {
+export const getTasks = () => {
   return (dispatch, getState, { getFirestore }) => {
     dispatch({
       type: GET_TASK_START,
     });
-    const fireStore = getFirestore(); 
+    const fireStore = getFirestore();
     fireStore
-    .collection('tasks')
-    .get()
-    .then((res) => {
-      console.log(res)
-          const fetchedTasks = [];
-        for (let key in res.data) {
-          fetchedTasks.push({
-            ...res.data[key],
-            id: key,
-          });
-        }
-        dispatch({ type: GET_TASK_SUCCESS, payload: fetchedTasks });
-    })
-    .catch((err) =>dispatch({ type: GET_TASK_FAIL, payload: err }));
-    // axiosService
-    //   .get('/tasks.json')
-    //   .then((res) => {
-    //     const fetchedTasks = [];
-    //     for (let key in res.data) {
-    //       fetchedTasks.push({
-    //         ...res.data[key],
-    //         id: key,
-    //       });
-    //     }
-    //     dispatch({ type: GET_TASK_SUCCESS, payload: fetchedTasks });
-    //   })
-    //   .catch((err) => dispatch({ type: GET_TASK_FAIL, payload: err }));
+      .collection('tasks')
+      .get()
+      .then((res) => {
+        dispatch({ type: GET_TASK_SUCCESS });
+      })
+      .catch((err) => dispatch({ type: GET_TASK_FAIL, payload: err }));
   };
 };
 
@@ -92,12 +71,12 @@ export const updateTask = (task) => {
 };
 
 export const deleteTask = (taskId) => {
-  return (dispatch) => {
-    axiosService.delete(`/tasks/${taskId}.json`).then((res) => {
-      dispatch({
-        type: DELETE_TASK_SUCCESS,
-        payload: taskId,
-      });
-    });
+  return (dispatch, getState, { getFirestore }) => {
+    const fireStore = getFirestore();
+    fireStore
+      .collection('tasks')
+      .doc(taskId)
+      .delete()
+      .then(() => dispatch({ type: DELETE_TASK_SUCCESS }));
   };
 };
