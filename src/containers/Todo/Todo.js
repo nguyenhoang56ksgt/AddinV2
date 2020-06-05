@@ -21,17 +21,25 @@ const Todo = ({
   loading,
   onAddTask,
   tasks,
-
+  finishedTasks,
+  onUpdateTask,
   onDeleteTask,
-  firebase,
-  store,
+  onGetDoneTask,
 }) => {
   useEffect(() => {}, []);
 
   const [selectedTags, setSelectedTags] = useState([taskTags[0]]);
 
-  const deleteTask = (taskId) => {
+  const handleDeleteTask = (taskId) => {
     onDeleteTask(taskId);
+  };
+
+  const handleUpdateTask = (task) => {
+    const updatedTask = {
+      ...task,
+      isDone: true,
+    };
+    onUpdateTask(updatedTask);
   };
   const handleAddTask = ({ taskname }) => {
     const task = {
@@ -46,10 +54,11 @@ const Todo = ({
     const nextSelectedTags = checked
       ? [...selectedTags, tag]
       : selectedTags.filter((t) => t !== tag);
-    console.log(nextSelectedTags);
     setSelectedTags(nextSelectedTags);
   };
-  const onTabChange = (key) => {};
+  const onTabChange = (key) => {
+    if (key === '2') onGetDoneTask();
+  };
 
   const columns = [
     {
@@ -95,11 +104,13 @@ const Todo = ({
           <Button size="small">
             <EditOutlined />
           </Button>
-          <Button size="small">Done</Button>
+          <Button size="small" onClick={() => handleUpdateTask(record)}>
+            Done
+          </Button>
           <Button size="small">
             <Popconfirm
               title="Are you sure delete this task?"
-              onConfirm={() => deleteTask(record.key)}
+              onConfirm={() => handleDeleteTask(record.key)}
               onCancel={cancel}
               okText="Yes"
               cancelText="No"
@@ -113,11 +124,14 @@ const Todo = ({
   ];
   const fetchedTasks = [];
   for (let key in tasks) {
-    fetchedTasks.push({
-      ...tasks[key],
-      id: key,
-    });
+    if (tasks[key]) {
+      fetchedTasks.push({
+        ...tasks[key],
+        id: key,
+      });
+    }
   }
+
   const data = fetchedTasks.reverse().map((task) => {
     return {
       key: task.id,
@@ -127,6 +141,14 @@ const Todo = ({
     };
   });
 
+  const dataFinishedTask = finishedTasks.map((task)=>{
+    return {
+      key: task.key,
+      date: task.createdAt,
+      name: task.name,
+      tags: task.tags,
+    };
+  })
   return (
     <>
       <Form layout="inline" className={classes.Todo} onFinish={handleAddTask}>
@@ -166,7 +188,7 @@ const Todo = ({
             <Table loading={loading} columns={columns} dataSource={data} />
           </TabPane>
           <TabPane tab="Task done" key="2">
-            Content of Tab Pane 2
+          <Table loading={loading} columns={columns} dataSource={dataFinishedTask} />
           </TabPane>
         </Tabs>
       </div>
@@ -176,25 +198,35 @@ const Todo = ({
 
 Todo.propTypes = {
   loading: PropTypes.bool.isRequired,
+  finishedTasks:PropTypes.array.isRequired,
   onAddTask: PropTypes.func.isRequired,
+  onUpdateTask: PropTypes.func.isRequired,
+  onGetDoneTask: PropTypes.func.isRequired,
   tasks: PropTypes.object.isRequired,
-
   onDeleteTask: PropTypes.func.isRequired,
 };
 const mapStateToProps = (state) => {
   return {
     loading: state.task.loading,
     tasks: state.firestore.data.tasks,
+    finishedTasks: state.task.finishedTasks,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onAddTask: (task) => dispatch(actions.addTask(task)), 
+    onAddTask: (task) => dispatch(actions.addTask(task)),
     onDeleteTask: (taskId) => dispatch(actions.deleteTask(taskId)),
+    onUpdateTask: (task) => dispatch(actions.updateTask(task)),
+    onGetDoneTask: () => dispatch(actions.getDoneTasks()),
   };
 };
 export default compose(
   connect(mapStateToProps, mapDispatchToProps),
-  firestoreConnect([{ collection: 'tasks', orderBy: ['createdAt'] }]),
+  firestoreConnect([
+    {
+      collection: 'tasks',
+      where: [['isDone', '==', false]],
+    },
+  ]),
 )(Todo);

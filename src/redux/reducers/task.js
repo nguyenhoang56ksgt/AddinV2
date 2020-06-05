@@ -10,7 +10,7 @@ import {
 
 const initialState = {
   loading: false,
-  
+  finishedTasks: [],
 };
 
 export default function (state = initialState, action) {
@@ -26,13 +26,14 @@ export default function (state = initialState, action) {
     case ADD_TASK_SUCCESS:
       return {
         ...state,
-        tasks: [payload, ...state.tasks],
+
         loading: false,
       };
     case GET_TASK_SUCCESS:
       return {
         ...state,
         loading: false,
+        finishedTasks: [...payload],
       };
     case ADD_TASK_FAIL:
     case GET_TASK_FAIL:
