@@ -40,7 +40,10 @@ export const getDoneTasks = () => {
         let doneTask = [];
         res.forEach((doc) => {
           doneTask.push(doc.data());
-        }); 
+        });
+
+        //sort by date
+        doneTask.sort((a, b) => -(a.createdAt - b.createdAt));
         dispatch({ type: GET_TASK_SUCCESS, payload: doneTask });
       })
       .catch((err) => dispatch({ type: GET_TASK_FAIL, payload: err }));

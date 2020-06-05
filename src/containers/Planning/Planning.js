@@ -1,17 +1,20 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
-import { firestoreConnect } from 'react-redux-firebase';
+
 import { compose } from 'redux';
 import { Timeline, Typography } from 'antd';
 import moment from 'moment';
 import * as actions from '../../redux/actions';
-const Planning = ({ tasks }) => {
+const Planning = ({ onGetDoneTask, finishedTasks }) => {
+  useEffect(() => {
+    onGetDoneTask();
+  }, [onGetDoneTask]);
   let obj = {};
 
-  for (const key in tasks) {
-    if (tasks.hasOwnProperty(key)) {
-      const task = tasks[key];
-      const date = moment.utc(task.createdAt).format('YYYY-MM-DD');
+  for (const key in finishedTasks) {
+    if (finishedTasks.hasOwnProperty(key)) {
+      const task = finishedTasks[key];
+      const date = moment.utc(task.createdAt).format('dddd, YYYY-MM-DD');
       if (!obj[date]) {
         obj[date] = task.name;
       } else {
@@ -22,7 +25,7 @@ const Planning = ({ tasks }) => {
 
   const timeline = Object.keys(obj).map((key) => (
     <Timeline.Item key={key}>
-      <Typography.Text>{key}</Typography.Text>
+      <Typography.Text style={{fontWeight:'bold'}}>{key}</Typography.Text>
       <br />
       <Typography.Text style={{ whiteSpace: 'pre-line' }}>
         {obj[key]}
@@ -31,15 +34,15 @@ const Planning = ({ tasks }) => {
   ));
 
   return (
-    <div  style={{ margin: '10px auto' }}>
-      <Timeline style={{ margin: '10px auto' }}>{timeline}</Timeline>
+    <div style={{ margin: '10px auto' }}>
+      <Timeline  mode="alternate"   pending="Recording..." style={{ margin: '10px auto' }}>{timeline}</Timeline>
     </div>
   );
 };
 const mapStateToProps = (state) => {
   return {
     loading: state.task.loading,
-    tasks: state.firestore.data.tasks,
+
     finishedTasks: state.task.finishedTasks,
   };
 };
@@ -49,12 +52,4 @@ const mapDispatchToProps = (dispatch) => {
     onGetDoneTask: () => dispatch(actions.getDoneTasks()),
   };
 };
-export default compose(
-  connect(mapStateToProps, mapDispatchToProps),
-  firestoreConnect([
-    {
-      collection: 'tasks',
-      where: [['isDone', '==', true]],
-    },
-  ]),
-)(Planning);
+export default compose(connect(mapStateToProps, mapDispatchToProps))(Planning);

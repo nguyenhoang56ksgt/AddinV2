@@ -18,6 +18,7 @@ function cancel(e) {
   console.log(e);
 }
 const Todo = ({
+  auth,
   loading,
   onAddTask,
   tasks,
@@ -26,7 +27,7 @@ const Todo = ({
   onDeleteTask,
   onGetDoneTask,
 }) => {
-  useEffect(() => {}, []);
+  useEffect(() => {}, [auth, onDeleteTask]);
 
   const [selectedTags, setSelectedTags] = useState([taskTags[0]]);
 
@@ -34,10 +35,11 @@ const Todo = ({
     onDeleteTask(taskId);
   };
 
-  const handleUpdateTask = (task) => {
+  const handleFinishTask = (task) => {
     const updatedTask = {
       ...task,
       isDone: true,
+      finishedAt: Date.now(),
     };
     onUpdateTask(updatedTask);
   };
@@ -104,7 +106,7 @@ const Todo = ({
           <Button size="small">
             <EditOutlined />
           </Button>
-          <Button size="small" onClick={() => handleUpdateTask(record)}>
+          <Button size="small" onClick={() => handleFinishTask(record)}>
             Done
           </Button>
           <Button size="small">
@@ -141,54 +143,67 @@ const Todo = ({
     };
   });
 
-  const dataFinishedTask = finishedTasks.map((task)=>{
+  const dataFinishedTask = finishedTasks.map((task) => {
     return {
       key: task.key,
       date: task.createdAt,
       name: task.name,
       tags: task.tags,
     };
-  })
+  });
+  let input;
+  if (auth.uid) {
+    input = (
+      <>
+        <Form layout="inline" className={classes.Todo} onFinish={handleAddTask}>
+          <Form.Item
+            className={classes.Input}
+            name="taskname"
+            rules={[
+              {
+                required: true,
+                message: 'Please input task name!',
+              },
+            ]}
+          >
+            <Input placeholder="Add Task"></Input>
+          </Form.Item>
+          <Form.Item className={classes.Button}>
+            <Button htmlType="submit" type="primary" loading={loading}>
+              Add Task
+            </Button>
+          </Form.Item>
+        </Form>
+        <div className={classes.Todo}>
+          <span style={{ marginRight: 8, fontWeight: 'bold' }}>Tags:</span>
+          {taskTags.map((tag) => (
+            <CheckableTag
+              key={tag}
+              checked={selectedTags.indexOf(tag) > -1}
+              onChange={(checked) => handleChange(tag, checked)}
+            >
+              {tag}
+            </CheckableTag>
+          ))}
+        </div>
+      </>
+    );
+  }
   return (
     <>
-      <Form layout="inline" className={classes.Todo} onFinish={handleAddTask}>
-        <Form.Item
-          className={classes.Input}
-          name="taskname"
-          rules={[
-            {
-              required: true,
-              message: 'Please input task name!',
-            },
-          ]}
-        >
-          <Input placeholder="Add Task"></Input>
-        </Form.Item>
-        <Form.Item className={classes.Button}>
-          <Button htmlType="submit" type="primary" loading={loading}>
-            Add Task
-          </Button>
-        </Form.Item>
-      </Form>
-      <div className={classes.Todo}>
-        <span style={{ marginRight: 8, fontWeight: 'bold' }}>Tags:</span>
-        {taskTags.map((tag) => (
-          <CheckableTag
-            key={tag}
-            checked={selectedTags.indexOf(tag) > -1}
-            onChange={(checked) => handleChange(tag, checked)}
-          >
-            {tag}
-          </CheckableTag>
-        ))}
-      </div>
+      {input}
+
       <div className={classes.Table}>
         <Tabs defaultActiveKey="1" onChange={onTabChange}>
           <TabPane tab="Tasks to do" key="1">
             <Table loading={loading} columns={columns} dataSource={data} />
           </TabPane>
           <TabPane tab="Task done" key="2">
-          <Table loading={loading} columns={columns} dataSource={dataFinishedTask} />
+            <Table
+              loading={loading}
+              columns={columns}
+              dataSource={dataFinishedTask}
+            />
           </TabPane>
         </Tabs>
       </div>
@@ -198,7 +213,7 @@ const Todo = ({
 
 Todo.propTypes = {
   loading: PropTypes.bool.isRequired,
-  finishedTasks:PropTypes.array.isRequired,
+  finishedTasks: PropTypes.array.isRequired,
   onAddTask: PropTypes.func.isRequired,
   onUpdateTask: PropTypes.func.isRequired,
   onGetDoneTask: PropTypes.func.isRequired,
@@ -207,6 +222,7 @@ Todo.propTypes = {
 };
 const mapStateToProps = (state) => {
   return {
+    auth: state.firebase.auth,
     loading: state.task.loading,
     tasks: state.firestore.data.tasks,
     finishedTasks: state.task.finishedTasks,
